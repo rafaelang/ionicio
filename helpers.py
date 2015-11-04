@@ -1,6 +1,5 @@
-import urllib2
 import base64
-import json
+import requests
 
 class IonicPush(object):
 
@@ -14,10 +13,10 @@ class IonicPush(object):
         cls.auth = "Basic %s" % b64
 
     @classmethod
-    def _set_headers(cls):
-        cls.req.add_header("Content-Type", "application/json")
-        cls.req.add_header("X-Ionic-Application-Id", cls.app_id)
-        cls.req.add_header("Authorization", cls.auth)
+    def get_headers(cls):
+        return {"Content-Type": "application/json",
+            "X-Ionic-Application-Id": cls.app_id,
+            "Authorization": cls.auth}
 
     @classmethod
     def send(cls, tokens, msg, **kwargs):
@@ -28,15 +27,8 @@ class IonicPush(object):
         push_dict["notification"] = notification_dict
         push_dict["production"] = kwargs.get('production', True)
 
-        push_dict = json.dumps(push_dict)
-
-        cls.req = urllib2.Request(cls.url+'push/', data=push_dict)
-        cls._set_headers()
-
-        return urllib2.urlopen(cls.req)
+        return requests.post(cls.url+'push/', json=push_dict, headers=cls.get_headers())
 
     @classmethod
     def check_message(cls, id):
-        cls.req = urllib2.Request(cls.url+'status/'+id)
-        cls._set_headers()
-        return urllib2.urlopen(cls.req)
+        return requests.get(cls.url+'status/'+id, headers=cls.get_headers())
