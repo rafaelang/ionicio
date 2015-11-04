@@ -2,7 +2,7 @@
 Django module for ionic.io
 
 ```python
-from ionicpush import IonicPush
+from ionicio import IonicPush
 
 IonicPush.send(tokens, instance.__unicode__())
 ```
